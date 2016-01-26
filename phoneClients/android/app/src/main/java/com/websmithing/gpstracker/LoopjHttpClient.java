@@ -30,7 +30,7 @@ public class LoopjHttpClient {
     public static void postCSV(Context context, String url, HashMap<String, String> data, AsyncHttpResponseHandler responseHandler) {
         String postData = "";
         for(Map.Entry<String, String> entry: data.entrySet()) {
-            postData += "0,"+entry.getKey()+","+entry.getValue()+"\r";
+            postData += "0,"+entry.getKey()+","+entry.getValue()+" ";
         }
 
         try {
