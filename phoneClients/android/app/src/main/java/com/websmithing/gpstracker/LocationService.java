@@ -23,6 +23,7 @@ import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.TimeZone;
 
 //import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -143,9 +144,18 @@ public class LocationService extends Service implements
         Float direction = location.getBearing();
         requestParams.put("direction",  Integer.toString(direction.intValue()));
 
+        final HashMap<String, String> csvData = new HashMap<>();
+        csvData.put("accuracy", Integer.toString(accuracyInFeet.intValue()));
+        csvData.put("direction",  Integer.toString(direction.intValue()));
+        csvData.put("speed",   Integer.toString(speedInMilesPerHour.intValue()));
+        csvData.put("altitude",   Integer.toString(altitudeInFeet.intValue()));
+        csvData.put("LAT",   Double.toString(location.getLatitude()));
+        csvData.put("LNG",   Double.toString(location.getLongitude()));
+
+
         final String uploadWebsite = sharedPreferences.getString("defaultUploadWebsite", defaultUploadWebsite);
 
-        LoopjHttpClient.get(uploadWebsite, requestParams, new AsyncHttpResponseHandler() {
+        LoopjHttpClient.postCSV(getApplicationContext(), uploadWebsite, csvData, new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody) {
                 LoopjHttpClient.debugLoopJ(TAG, "sendLocationDataToWebsite - success", uploadWebsite, requestParams, responseBody, headers, statusCode, null);
@@ -157,6 +167,19 @@ public class LocationService extends Service implements
                 stopSelf();
             }
         });
+
+//        LoopjHttpClient.get(uploadWebsite, requestParams, new AsyncHttpResponseHandler() {
+//            @Override
+//            public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody) {
+//                LoopjHttpClient.debugLoopJ(TAG, "sendLocationDataToWebsite - success", uploadWebsite, requestParams, responseBody, headers, statusCode, null);
+//                stopSelf();
+//            }
+//            @Override
+//            public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] errorResponse, Throwable e) {
+//                LoopjHttpClient.debugLoopJ(TAG, "sendLocationDataToWebsite - failure", uploadWebsite, requestParams, errorResponse, headers, statusCode, e);
+//                stopSelf();
+//            }
+//        });
     }
 
     @Override
